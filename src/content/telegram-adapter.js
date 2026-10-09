@@ -1,6 +1,11 @@
 const CLIENTS = {
   a: {
     root: '#MiddleColumn',
+    mountSelectors: [
+      '.message-input-wrapper',
+      '[data-telegram-composer]',
+      '.input-message-container',
+    ],
     composerSelectors: [
       '.input-message-input[contenteditable]:not([contenteditable="false"])',
       '[role="textbox"][contenteditable]:not([contenteditable="false"])',
@@ -9,6 +14,12 @@ const CLIENTS = {
   },
   k: {
     root: '#column-center',
+    mountSelectors: [
+      '.chat-input',
+      '.chat-input-container',
+      '[data-telegram-composer]',
+      '.input-message-container',
+    ],
     composerSelectors: [
       '.input-message-input[contenteditable]:not([contenteditable="false"])',
       '[role="textbox"][contenteditable]:not([contenteditable="false"])',
@@ -16,13 +27,6 @@ const CLIENTS = {
     ],
   },
 };
-
-const MOUNT_SELECTOR = [
-  '.input-message-container',
-  '.message-input-wrapper',
-  '.chat-input',
-  '[data-telegram-composer]',
-].join(',');
 
 const SEND_SELECTOR = [
   'button[aria-label*="send" i]',
@@ -60,6 +64,14 @@ function findFirst(root, selectors) {
   return null;
 }
 
+function findPreferredAncestor(element, selectors) {
+  for (const selector of selectors) {
+    const match = element.closest(selector);
+    if (match) return match;
+  }
+  return element.parentElement;
+}
+
 function createInputEvent(document, type, text) {
   return new document.defaultView.InputEvent(type, {
     bubbles: true,
@@ -82,7 +94,7 @@ export function createTelegramAdapter({ document, pathname }) {
       const composer = findFirst(root, client.composerSelectors);
       if (!composer) return null;
 
-      const mountTarget = composer.closest(MOUNT_SELECTOR) || composer.parentElement;
+      const mountTarget = findPreferredAncestor(composer, client.mountSelectors);
       if (!mountTarget) return null;
       const sendScope = mountTarget.parentElement || mountTarget;
       const sendButton = mountTarget.querySelector(SEND_SELECTOR)

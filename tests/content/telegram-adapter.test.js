@@ -7,9 +7,19 @@ import { createTelegramAdapter } from '../../src/content/telegram-adapter.js';
 const fixture = (name) => readFileSync(resolve('tests/fixtures', name), 'utf8');
 
 describe.each([
-  { client: 'Web A', pathname: '/a/', fixtureName: 'telegram-a-composer.html' },
-  { client: 'Web K', pathname: '/k/', fixtureName: 'telegram-k-composer.html' },
-])('$client Telegram adapter', ({ pathname, fixtureName }) => {
+  {
+    client: 'Web A',
+    pathname: '/a/',
+    fixtureName: 'telegram-a-composer.html',
+    mountClass: 'message-input-wrapper',
+  },
+  {
+    client: 'Web K',
+    pathname: '/k/',
+    fixtureName: 'telegram-k-composer.html',
+    mountClass: 'chat-input',
+  },
+])('$client Telegram adapter', ({ pathname, fixtureName, mountClass }) => {
   beforeEach(() => {
     document.body.innerHTML = fixture(fixtureName);
   });
@@ -20,7 +30,7 @@ describe.each([
     const context = adapter.findContext();
 
     expect(context.composer.getAttribute('role')).toBe('textbox');
-    expect(context.mountTarget.classList.contains('input-message-container')).toBe(true);
+    expect(context.mountTarget.classList.contains(mountClass)).toBe(true);
     expect(context.sendButton.tagName).toBe('BUTTON');
   });
 

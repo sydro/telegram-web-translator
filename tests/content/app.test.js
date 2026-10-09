@@ -111,12 +111,12 @@ describe('Telegram translator content application', () => {
     expect(oldPanel.isConnected).toBe(false);
   });
 
-  it('mounts the translation panel immediately above the input container', async () => {
+  it('mounts the translation panel outside and immediately above the whole composer wrapper', async () => {
     await start();
-    const inputContainer = document.querySelector('.input-message-container');
+    const composerWrapper = document.querySelector('.message-input-wrapper');
 
-    expect(panel().parentElement).toBe(inputContainer.parentElement);
-    expect(panel().nextElementSibling).toBe(inputContainer);
+    expect(panel().parentElement).toBe(composerWrapper.parentElement);
+    expect(panel().nextElementSibling).toBe(composerWrapper);
   });
 
   it('translates composer input after the configured delay', async () => {
