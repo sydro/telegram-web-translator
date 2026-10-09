@@ -213,6 +213,21 @@ describe('Telegram translator content application', () => {
     expect(panel().hidden).toBe(true);
   });
 
+  it('hides the preview when Telegram clears the composer after a native send', async () => {
+    await start();
+    typeDraft('Invia in italiano');
+    await revealTranslation();
+    nativeSendButton().addEventListener('click', () => {
+      composer().firstChild.data = '';
+    });
+
+    nativeSendButton().click();
+    await flushDom();
+
+    expect(composer().textContent).toBe('');
+    expect(panel().hidden).toBe(true);
+  });
+
   it('refuses translated sending if the source changed without an input event', async () => {
     await start();
     typeDraft('Ciao');

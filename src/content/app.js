@@ -99,6 +99,10 @@ export async function startTelegramTranslator({
   const mountContext = (nextContext) => {
     if (context?.composer === nextContext?.composer && panel?.host.isConnected) {
       context = nextContext;
+      const currentDraft = adapter.readDraft(context);
+      if (!composing && currentDraft !== controller.getSnapshot().sourceText) {
+        controller.updateDraft(currentDraft);
+      }
       return;
     }
 
@@ -138,7 +142,7 @@ export async function startTelegramTranslator({
   };
 
   const observer = new MutationObserverClass(queueDiscovery);
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.body, { childList: true, characterData: true, subtree: true });
   discover();
 
   const handleStorageChange = (changes, areaName) => {
