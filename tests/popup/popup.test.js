@@ -5,6 +5,7 @@ import { bindSettingsPopup } from '../../src/popup/popup.js';
 function renderPopupFixture() {
   document.body.innerHTML = `
     <form id="settings-form" novalidate>
+      <input id="extension-enabled" name="enabled" type="checkbox">
       <input id="delay-ms" name="delayMs" type="number">
       <select id="source-language" name="sourceLanguage"></select>
       <select id="target-language" name="targetLanguage"></select>
@@ -37,6 +38,7 @@ describe('settings popup', () => {
 
   it('hydrates saved values and renders every supported language', async () => {
     const storageArea = createStorage({
+      enabled: false,
       delayMs: 1100,
       sourceLanguage: 'fr',
       targetLanguage: 'de',
@@ -44,6 +46,7 @@ describe('settings popup', () => {
 
     await bindSettingsPopup({ document, storageArea });
 
+    expect(document.querySelector('#extension-enabled').checked).toBe(false);
     expect(document.querySelector('#delay-ms').value).toBe('1100');
     expect(document.querySelector('#source-language').value).toBe('fr');
     expect(document.querySelector('#target-language').value).toBe('de');
@@ -54,6 +57,7 @@ describe('settings popup', () => {
   it('uses Italian and English defaults when storage is empty', async () => {
     await bindSettingsPopup({ document, storageArea: createStorage() });
 
+    expect(document.querySelector('#extension-enabled').checked).toBe(true);
     expect(document.querySelector('#delay-ms').value).toBe('700');
     expect(document.querySelector('#source-language').value).toBe('it');
     expect(document.querySelector('#target-language').value).toBe('en');
@@ -70,7 +74,7 @@ describe('settings popup', () => {
     await settle();
 
     expect(storageArea.set).toHaveBeenCalledWith({
-      settings: { delayMs: 900, sourceLanguage: 'es', targetLanguage: 'fr' },
+      settings: { enabled: true, delayMs: 900, sourceLanguage: 'es', targetLanguage: 'fr' },
     });
     expect(document.querySelector('#settings-status').textContent).toContain('salvate');
   });
@@ -104,11 +108,38 @@ describe('settings popup', () => {
     expect(document.querySelector('#delay-ms').value).toBe('700');
   });
 
+  it('persists the enabled toggle immediately without saving draft form changes', async () => {
+    const storageArea = createStorage({
+      enabled: true,
+      delayMs: 700,
+      sourceLanguage: 'it',
+      targetLanguage: 'en',
+    });
+    await bindSettingsPopup({ document, storageArea });
+    document.querySelector('#delay-ms').value = '1200';
+    const enabledToggle = document.querySelector('#extension-enabled');
+
+    enabledToggle.checked = false;
+    enabledToggle.dispatchEvent(new Event('change', { bubbles: true }));
+    await settle();
+
+    expect(storageArea.set).toHaveBeenCalledWith({
+      settings: {
+        enabled: false,
+        delayMs: 700,
+        sourceLanguage: 'it',
+        targetLanguage: 'en',
+      },
+    });
+    expect(document.querySelector('#settings-status').textContent).toContain('disattivata');
+  });
+
   it('removes its submit listener when disposed', async () => {
     const storageArea = createStorage();
     const binding = await bindSettingsPopup({ document, storageArea });
     binding.dispose();
 
+    document.querySelector('#extension-enabled').dispatchEvent(new Event('change', { bubbles: true }));
     submitForm();
     await settle();
 

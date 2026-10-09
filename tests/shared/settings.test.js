@@ -21,6 +21,7 @@ describe('translation settings', () => {
 
   it('uses the exact product defaults', () => {
     expect(DEFAULT_SETTINGS).toEqual({
+      enabled: true,
       delayMs: 700,
       sourceLanguage: 'it',
       targetLanguage: 'en',
@@ -65,10 +66,12 @@ describe('translation settings', () => {
 
   it('normalizes each valid field independently', () => {
     expect(normalizeSettings({
+      enabled: false,
       delayMs: 1200,
       sourceLanguage: 'fr',
       targetLanguage: 'not-a-language',
     })).toEqual({
+      enabled: false,
       delayMs: 1200,
       sourceLanguage: 'fr',
       targetLanguage: 'en',
@@ -81,6 +84,7 @@ describe('translation settings', () => {
       sourceLanguage: 'en',
       targetLanguage: 'not-a-language',
     })).toEqual({
+      enabled: true,
       delayMs: 900,
       sourceLanguage: 'it',
       targetLanguage: 'en',
@@ -90,11 +94,12 @@ describe('translation settings', () => {
   it('loads and normalizes settings from the single storage key', async () => {
     const storageArea = {
       get: vi.fn().mockResolvedValue({
-        settings: { delayMs: 1000, sourceLanguage: 'de', targetLanguage: 'fr' },
+        settings: { enabled: false, delayMs: 1000, sourceLanguage: 'de', targetLanguage: 'fr' },
       }),
     };
 
     await expect(loadSettings(storageArea)).resolves.toEqual({
+      enabled: false,
       delayMs: 1000,
       sourceLanguage: 'de',
       targetLanguage: 'fr',
@@ -104,7 +109,7 @@ describe('translation settings', () => {
 
   it('saves valid settings and does not write invalid settings', async () => {
     const storageArea = { set: vi.fn().mockResolvedValue(undefined) };
-    const valid = { delayMs: 800, sourceLanguage: 'es', targetLanguage: 'de' };
+    const valid = { enabled: false, delayMs: 800, sourceLanguage: 'es', targetLanguage: 'de' };
 
     await expect(saveSettings(storageArea, valid)).resolves.toEqual({ ok: true, value: valid });
     expect(storageArea.set).toHaveBeenCalledWith({ settings: valid });

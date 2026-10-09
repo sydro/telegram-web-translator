@@ -17,6 +17,17 @@
       </header>
 
       <form id="settings-form" novalidate>
+        <div class="toggle-row">
+          <div>
+            <label for="extension-enabled">Estensione attiva</label>
+            <p>Mostra e prepara le traduzioni su Telegram Web</p>
+          </div>
+          <label class="switch" aria-label="Attiva o disattiva l’estensione">
+            <input id="extension-enabled" name="enabled" type="checkbox">
+            <span aria-hidden="true"></span>
+          </label>
+        </div>
+
         <label for="source-language">Lingua di origine</label>
         <select id="source-language" name="sourceLanguage"></select>
 

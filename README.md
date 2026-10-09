@@ -57,6 +57,8 @@ modello. La scheda mostra l'avanzamento quando Chrome lo rende disponibile.
 
 Premi l'icona dell'estensione nella barra di Chrome per modificare:
 
+- **Estensione attiva**, un interruttore salvato immediatamente che sospende o
+  riattiva traduzioni e anteprime senza interferire con Telegram;
 - **Lingua di origine**, predefinita su Italiano;
 - **Lingua di destinazione**, predefinita su Inglese;
 - **Ritardo anteprima**, da 300 a 3000 ms a intervalli di 100 ms, predefinito
@@ -78,9 +80,10 @@ Il testo dei messaggi:
 - non viene registrato nei log;
 - non viene inviato dall'estensione a server o API esterne.
 
-In storage vengono conservati soltanto il ritardo e i due codici lingua. Chrome
-può collegarsi ai propri servizi per scaricare i modelli linguistici, ma il
-download del modello non contiene il testo del messaggio.
+In storage vengono conservati soltanto lo stato attivo/disattivo, il ritardo e
+i due codici lingua. Chrome può collegarsi ai propri servizi per scaricare i
+modelli linguistici, ma il download del modello non contiene il testo del
+messaggio.
 
 ## Limitazioni della prima versione
 
@@ -106,10 +109,12 @@ Esegui questi controlli sia su Telegram Web A sia su Web K:
 7. Il primo download del modello mostra lo stato e le traduzioni successive
    riutilizzano il modello pronto.
 8. Cambiare ritardo o lingue aggiorna una scheda Telegram già aperta.
-9. Le coppie disponibili funzionano; una coppia indisponibile mostra un errore
+9. Disattivare il toggle rimuove subito la scheda e impedisce nuove traduzioni;
+   riattivarlo riprende dal testo presente nel composer.
+10. Le coppie disponibili funzionano; una coppia indisponibile mostra un errore
    senza bloccare Telegram.
-10. Cambiare chat lascia una sola scheda montata accanto al nuovo composer.
-11. Un errore di traduzione non interferisce con il normale invio di Telegram.
+11. Cambiare chat lascia una sola scheda montata accanto al nuovo composer.
+12. Un errore di traduzione non interferisce con il normale invio di Telegram.
 
 ## Struttura essenziale
 

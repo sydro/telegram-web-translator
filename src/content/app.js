@@ -10,7 +10,7 @@ export async function startTelegramTranslator({
   translatorApi,
   MutationObserverClass = document.defaultView.MutationObserver,
 }) {
-  const settings = await loadSettings(storageArea);
+  let settings = await loadSettings(storageArea);
   const adapter = createTelegramAdapter({ document, pathname: location.pathname });
   let context = null;
   let panel = null;
@@ -124,6 +124,10 @@ export async function startTelegramTranslator({
   const discover = () => {
     discoveryQueued = false;
     if (disposed) return;
+    if (!settings.enabled) {
+      mountContext(null);
+      return;
+    }
     mountContext(adapter.findContext());
   };
 
@@ -139,7 +143,14 @@ export async function startTelegramTranslator({
 
   const handleStorageChange = (changes, areaName) => {
     if (disposed || areaName !== 'sync' || !changes.settings) return;
-    controller.updateSettings(normalizeSettings(changes.settings.newValue));
+    settings = normalizeSettings(changes.settings.newValue);
+    controller.updateSettings(settings);
+    if (!settings.enabled) {
+      controller.updateDraft('');
+      mountContext(null);
+      return;
+    }
+    discover();
   };
   storageArea.onChanged?.addListener(handleStorageChange);
 

@@ -18,16 +18,18 @@ function fillLanguageSelect(select, selectedCode) {
 
 export async function bindSettingsPopup({ document, storageArea }) {
   const form = document.querySelector('#settings-form');
+  const enabledToggle = document.querySelector('#extension-enabled');
   const delayInput = document.querySelector('#delay-ms');
   const sourceSelect = document.querySelector('#source-language');
   const targetSelect = document.querySelector('#target-language');
   const status = document.querySelector('#settings-status');
 
-  if (!form || !delayInput || !sourceSelect || !targetSelect || !status) {
+  if (!form || !enabledToggle || !delayInput || !sourceSelect || !targetSelect || !status) {
     throw new Error('Markup delle impostazioni incompleto.');
   }
 
-  const settings = await loadSettings(storageArea);
+  let settings = await loadSettings(storageArea);
+  enabledToggle.checked = settings.enabled;
   delayInput.value = String(settings.delayMs);
   fillLanguageSelect(sourceSelect, settings.sourceLanguage);
   fillLanguageSelect(targetSelect, settings.targetLanguage);
@@ -37,6 +39,7 @@ export async function bindSettingsPopup({ document, storageArea }) {
     status.dataset.state = '';
 
     const candidate = {
+      enabled: enabledToggle.checked,
       delayMs: Number(delayInput.value),
       sourceLanguage: sourceSelect.value,
       targetLanguage: targetSelect.value,
@@ -49,7 +52,8 @@ export async function bindSettingsPopup({ document, storageArea }) {
     }
 
     try {
-      await saveSettings(storageArea, validation.value);
+      const result = await saveSettings(storageArea, validation.value);
+      settings = result.value;
       status.dataset.state = 'success';
       status.textContent = 'Impostazioni salvate.';
     } catch {
@@ -58,11 +62,33 @@ export async function bindSettingsPopup({ document, storageArea }) {
     }
   };
 
+  const handleEnabledChange = async () => {
+    const previousEnabled = settings.enabled;
+    const candidate = { ...settings, enabled: enabledToggle.checked };
+    status.dataset.state = '';
+
+    try {
+      const result = await saveSettings(storageArea, candidate);
+      if (!result.ok) throw new Error('invalid enabled state');
+      settings = result.value;
+      status.dataset.state = 'success';
+      status.textContent = settings.enabled
+        ? 'Estensione attivata.'
+        : 'Estensione disattivata.';
+    } catch {
+      enabledToggle.checked = previousEnabled;
+      status.dataset.state = 'error';
+      status.textContent = 'Impossibile cambiare lo stato dell’estensione. Riprova.';
+    }
+  };
+
   form.addEventListener('submit', handleSubmit);
+  enabledToggle.addEventListener('change', handleEnabledChange);
 
   return {
     dispose() {
       form.removeEventListener('submit', handleSubmit);
+      enabledToggle.removeEventListener('change', handleEnabledChange);
     },
   };
 }

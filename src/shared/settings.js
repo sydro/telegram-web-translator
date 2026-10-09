@@ -1,4 +1,5 @@
 export const DEFAULT_SETTINGS = Object.freeze({
+  enabled: true,
   delayMs: 700,
   sourceLanguage: 'it',
   targetLanguage: 'en',
@@ -63,6 +64,10 @@ export function validateSettings(candidate) {
   const value = candidate && typeof candidate === 'object' ? candidate : {};
   const errors = {};
 
+  if (typeof value.enabled !== 'boolean') {
+    errors.enabled = 'Lo stato dell’estensione non è valido.';
+  }
+
   if (!isValidDelay(value.delayMs)) {
     errors.delayMs = 'Inserisci un valore tra 300 e 3000 ms, a intervalli di 100 ms.';
   }
@@ -84,6 +89,7 @@ export function validateSettings(candidate) {
   return {
     ok: true,
     value: {
+      enabled: value.enabled,
       delayMs: value.delayMs,
       sourceLanguage: value.sourceLanguage,
       targetLanguage: value.targetLanguage,
@@ -94,6 +100,7 @@ export function validateSettings(candidate) {
 export function normalizeSettings(candidate) {
   const value = candidate && typeof candidate === 'object' ? candidate : {};
   const normalized = {
+    enabled: typeof value.enabled === 'boolean' ? value.enabled : DEFAULT_SETTINGS.enabled,
     delayMs: isValidDelay(value.delayMs) ? value.delayMs : DEFAULT_SETTINGS.delayMs,
     sourceLanguage: SUPPORTED_CODES.has(value.sourceLanguage)
       ? value.sourceLanguage

@@ -5,7 +5,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { startTelegramTranslator } from '../../src/content/app.js';
 
 const WEB_A_FIXTURE = readFileSync(resolve('tests/fixtures/telegram-a-composer.html'), 'utf8');
-const DEFAULTS = { delayMs: 700, sourceLanguage: 'it', targetLanguage: 'en' };
+const DEFAULTS = {
+  enabled: true,
+  delayMs: 700,
+  sourceLanguage: 'it',
+  targetLanguage: 'en',
+};
 
 function createStorage(initialSettings = DEFAULTS) {
   let settings = initialSettings;
@@ -127,6 +132,45 @@ describe('Telegram translator content application', () => {
 
     expect(panel().shadowRoot.querySelector('[data-role="translation"]').textContent).toBe('EN:Ciao');
     expect(panel().hidden).toBe(false);
+  });
+
+  it('stays inactive and does not mount a panel when disabled at startup', async () => {
+    const translatorApi = createTranslatorApi();
+    await start({
+      storageArea: createStorage({ ...DEFAULTS, enabled: false }),
+      translatorApi,
+    });
+
+    typeDraft('Non tradurre');
+    await revealTranslation(1000);
+
+    expect(panel()).toBeNull();
+    expect(translatorApi.availability).not.toHaveBeenCalled();
+  });
+
+  it('cancels pending work and removes the panel when disabled live', async () => {
+    const storageArea = createStorage();
+    const { translatorApi } = await start({ storageArea });
+    typeDraft('Non tradurre');
+
+    storageArea.emit({ ...DEFAULTS, enabled: false });
+    await revealTranslation(1000);
+
+    expect(panel()).toBeNull();
+    expect(translatorApi.availability).not.toHaveBeenCalled();
+  });
+
+  it('mounts again and translates the current draft when re-enabled live', async () => {
+    const storageArea = createStorage({ ...DEFAULTS, enabled: false });
+    await start({ storageArea });
+    composer().textContent = 'Ciao di nuovo';
+
+    storageArea.emit(DEFAULTS);
+    await flushDom();
+    await revealTranslation();
+
+    expect(panel().shadowRoot.querySelector('[data-role="translation"]').textContent)
+      .toBe('EN:Ciao di nuovo');
   });
 
   it('waits for compositionend before debouncing IME input', async () => {
