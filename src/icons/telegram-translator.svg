@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Telegram Web Translator</title>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="#3390ec"/>
+  <path fill="#fff" d="M26 24h76a10 10 0 0 1 10 10v49a10 10 0 0 1-10 10H58l-24 18 7-18H26a10 10 0 0 1-10-10V34a10 10 0 0 1 10-10Z"/>
+  <path fill="#3390ec" d="M41 75h-9l15-38h10l15 38h-9l-3-9H44l-3 9Zm6-17h10l-5-14-5 14Zm29-15h22v8H76v-8Zm0 23h22v8H76v-8Zm16-29 10 10-10 10V37ZM82 60 72 70l10 10V60Z"/>
+</svg>

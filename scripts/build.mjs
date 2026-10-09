@@ -9,7 +9,7 @@ const outputRoot = resolve(projectRoot, 'dist');
 async function copy(source, destination) {
   const outputPath = resolve(outputRoot, destination);
   await mkdir(dirname(outputPath), { recursive: true });
-  await cp(resolve(projectRoot, source), outputPath);
+  await cp(resolve(projectRoot, source), outputPath, { recursive: true });
 }
 
 await rm(outputRoot, { recursive: true, force: true });
@@ -34,6 +34,7 @@ await Promise.all([
   }),
   copy('src/popup/index.html', 'popup/index.html'),
   copy('src/popup/popup.css', 'popup/popup.css'),
+  copy('src/icons', 'icons'),
   copy('src/manifest.json', 'manifest.json'),
 ]);
 
