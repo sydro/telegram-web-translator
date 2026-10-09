@@ -17,7 +17,7 @@ describe.each([
     client: 'Web K',
     pathname: '/k/',
     fixtureName: 'telegram-k-composer.html',
-    mountClass: 'chat-input',
+    mountClass: 'chat-input-main-container',
   },
 ])('$client Telegram adapter', ({ pathname, fixtureName, mountClass }) => {
   beforeEach(() => {

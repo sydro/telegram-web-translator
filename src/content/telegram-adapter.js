@@ -15,8 +15,10 @@ const CLIENTS = {
   k: {
     root: '#column-center',
     mountSelectors: [
-      '.chat-input',
+      '.chat-input-container.chat-input-main-container',
+      '.chat-input-main-container',
       '.chat-input-container',
+      '.chat-input',
       '[data-telegram-composer]',
       '.input-message-container',
     ],
