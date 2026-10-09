@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Telegram Web Translator",
+  "version": "0.1.0",
+  "description": "Anteprima e invio di traduzioni locali su Telegram Web.",
+  "minimum_chrome_version": "138",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_title": "Impostazioni Telegram Translator",
+    "default_popup": "popup/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://web.telegram.org/a/*",
+        "https://web.telegram.org/k/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
