@@ -114,7 +114,7 @@ export async function startTelegramTranslator({
       onSend: handleTranslatedSend,
       onRetry: handleRetry,
     });
-    context.mountTarget.prepend(panel.host);
+    context.mountTarget.before(panel.host);
     context.composer.addEventListener('input', handleInput);
     context.composer.addEventListener('compositionstart', handleCompositionStart);
     context.composer.addEventListener('compositionend', handleCompositionEnd);
